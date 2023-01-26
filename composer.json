@@ -1,0 +1,36 @@
+{
+  "name": "esoftsk/sql-mig-bundle",
+  "description": "Database migrations based on SQL files",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "minimum-stability": "stable",
+  "authors": [{
+    "name": "Peter Ivan"
+  }],
+  "require": {
+    "php": ">=7.4",
+    "lstrojny/functional-php": "^1.17",
+    "symfony/orm-pack": "^2.2"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "EsoftSk\\SqlMigBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "EsoftSk\\SqlMigBundle\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^1.9",
+    "tomasvotruba/cognitive-complexity": "^0.0.5"
+  }
+}
