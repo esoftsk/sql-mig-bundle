@@ -5,15 +5,15 @@
     <services>
         <defaults autoconfigure="true" autowire="true" public="false"/>
 
-        <service id="esoftsk.sql_mig.service.migration_builder" class="EsoftSk\SqlMigBundle\Service\MigrationBuilder"/>
+        <service id="esoftsk.sql_mig.migration_builder" class="EsoftSk\SqlMigBundle\Service\MigrationBuilder"/>
 
-        <service id="esoftsk.sql_mig.service.database_migration" class="EsoftSk\SqlMigBundle\Service\DatabaseMigration">
-            <argument type="service" id="esoftsk.sql_mig.service.migration_builder" index="2"/>
+        <service id="esoftsk.sql_mig.database_migration" class="EsoftSk\SqlMigBundle\Service\DatabaseMigration">
+            <argument type="service" id="esoftsk.sql_mig.migration_builder" index="2"/>
         </service>
 
         <service id="esoftsk.sql_mig.command.apply" class="EsoftSk\SqlMigBundle\Command\ApplyCommand" public="true">
             <tag name="console.command" />
-            <argument type="service" id="esoftsk.sql_mig.service.database_migration"/>
+            <argument type="service" id="esoftsk.sql_mig.database_migration"/>
         </service>
 
     </services>
