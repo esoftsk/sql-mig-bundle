@@ -102,16 +102,22 @@ final class ApplyCommand extends Command
         $colorizeError = fn(string $s) => "<fg=red>$s</>";
 
         (new Table($output))
-            ->setRows(map($exceptions, function (MissingTransactionControl|MigrationCommandFailed $e) use ($filterErrors, $colorizeError) {
-                if (method_exists($e, 'getCommandOutput')) {
-                    $commandOutput = $e->getCommandOutput();
-                } else {
-                    $commandOutput = [];
-                }
+            ->setRows(map($exceptions, function ($e) use ($filterErrors, $colorizeError) {
+                /* @var $e MissingTransactionControl|MigrationCommandFailed */
 
-                return [
-                    join("\n", map(filter($commandOutput, $filterErrors), $colorizeError)),
-                ];
+                if ($e instanceof MissingTransactionControl || $e instanceof MigrationCommandFailed) {
+                    if (method_exists($e, 'getCommandOutput')) {
+                        $commandOutput = $e->getCommandOutput();
+                    } else {
+                        $commandOutput = [];
+                    }
+
+                    return [
+                        join("\n", map(filter($commandOutput, $filterErrors), $colorizeError)),
+                    ];
+                } else {
+                    return [];
+                }
             }))
             ->render();
     }
