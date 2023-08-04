@@ -34,6 +34,6 @@
     "tomasvotruba/cognitive-complexity": "^0.0.5"
   },
   "scripts": {
-    "stan": "vendor/bin/phpstan --memory-limit=2G analyse"
+    "stan": "vendor/bin/phpstan --xdebug --memory-limit=2G analyse"
   }
 }
