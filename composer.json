@@ -32,5 +32,8 @@
   "require-dev": {
     "phpstan/phpstan": "^1.9",
     "tomasvotruba/cognitive-complexity": "^0.0.5"
+  },
+  "scripts": {
+    "stan": "vendor/bin/phpstan --xdebug --memory-limit=2G analyse"
   }
 }
