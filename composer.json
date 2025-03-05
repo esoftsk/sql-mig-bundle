@@ -9,7 +9,6 @@
   }],
   "require": {
     "php": ">=7.4",
-    "lstrojny/functional-php": "^1.17",
     "symfony/orm-pack": "^2.2"
   },
   "config": {

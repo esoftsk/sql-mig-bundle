@@ -12,9 +12,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use function Functional\filter;
-use function Functional\map;
-use function Functional\some;
 
 final class ApplyCommand extends Command
 {
@@ -42,7 +39,14 @@ final class ApplyCommand extends Command
         $this->migrationsService->createDatabaseVersionTableIfNeeded();
 
         $results = $this->migrationsService->runMigrations();
-        $hasFailedMigrations = some($results, fn(MigrationResult $r) => DatabaseMigration::RESULT_FAILURE === $r->result);
+        $hasFailedMigrations = false;
+
+        foreach ($results as $r) {
+            if (DatabaseMigration::RESULT_FAILURE === $r->result) {
+                $hasFailedMigrations = true;
+                break;
+            }
+        }
 
         $this->printResults($output, $results);
 
@@ -56,7 +60,14 @@ final class ApplyCommand extends Command
     {
         $this->printResultTable($output, $results);
 
-        $hasErrors = some($results, fn(MigrationResult $r) => DatabaseMigration::RESULT_FAILURE === $r->result);
+        $hasErrors = false;
+
+        foreach ($results as $r) {
+            if (DatabaseMigration::RESULT_FAILURE === $r->result) {
+                $hasErrors = true;
+                break;
+            }
+        }
 
         if ($hasErrors) {
             $this->printErrorTable($output, $results);
@@ -73,7 +84,7 @@ final class ApplyCommand extends Command
 
         (new Table($output))
             ->setHeaders(['Migrácia', 'Výsledok'])
-            ->setRows(map($results, function (MigrationResult $r) use ($colorizeSuccess, $colorizeError) {
+            ->setRows(array_map(function (MigrationResult $r) use ($colorizeSuccess, $colorizeError) {
                 $migrationLabel = basename($r->migration->scriptPath);
                 $resultLabel = DatabaseMigration::RESULT_FAILURE === $r->result
                     ? $colorizeError('CHYBA') : $colorizeSuccess('OK');
@@ -82,7 +93,7 @@ final class ApplyCommand extends Command
                     $migrationLabel,
                     $resultLabel,
                 ];
-            }))
+            }, $results))
             ->render();
     }
 
@@ -102,7 +113,7 @@ final class ApplyCommand extends Command
         $colorizeError = fn(string $s) => "<fg=red>$s</>";
 
         (new Table($output))
-            ->setRows(map($exceptions, function ($e) use ($filterErrors, $colorizeError) {
+            ->setRows(array_map(function ($e) use ($filterErrors, $colorizeError) {
                 /* @var $e MissingTransactionControl|MigrationCommandFailed */
 
                 if ($e instanceof MissingTransactionControl || $e instanceof MigrationCommandFailed) {
@@ -113,12 +124,12 @@ final class ApplyCommand extends Command
                     }
 
                     return [
-                        join("\n", map(filter($commandOutput, $filterErrors), $colorizeError)),
+                        join("\n", array_map($colorizeError, array_filter($commandOutput, $filterErrors))),
                     ];
                 } else {
                     return [];
                 }
-            }))
+            }, $exceptions))
             ->render();
     }
 }

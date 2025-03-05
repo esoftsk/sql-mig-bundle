@@ -9,6 +9,7 @@ use EsoftSk\SqlMigBundle\Dto\MigrationResult;
 use EsoftSk\SqlMigBundle\Exception\MigrationCommandFailed;
 use EsoftSk\SqlMigBundle\Exception\MissingTransactionControl;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Url;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 
@@ -175,7 +176,13 @@ SQL;
 
     private function runMigration(Migration $migration): MigrationResult
     {
-        $dbUrl = str_replace('pgsql', 'postgresql', $_ENV['DATABASE_URL']);
+        $parsedUrl = parse_url($_ENV['DATABASE_URL']);
+
+        $parsedUrl['scheme'] = 'postgresql';
+        unset($parsedUrl['query']);
+
+        $dbUrl = "{$parsedUrl['scheme']}://{$parsedUrl['user']}:{$parsedUrl['pass']}@{$parsedUrl['host']}:{$parsedUrl['port']}{$parsedUrl['path']}";
+
         $commandTpl = "psql --set ON_ERROR_STOP=1 $dbUrl < %s 2>&1";
         $migrationScript = $this->createMigrationScript($migration);
 
